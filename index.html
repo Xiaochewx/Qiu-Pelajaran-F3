@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>丘祥Form3学习进度报告</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            slate: {
+              850: '#131b2e',
+              900: '#0f172a',
+              950: '#070b14',
+            }
+          },
+          animation: {
+            'bounce-soft': 'bounceSoft 2s infinite',
+            'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+            'float': 'float 4s ease-in-out infinite',
+            'spring-in': 'springIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+          },
+          keyframes: {
+            bounceSoft: {
+              '0%, 100%': { transform: 'translateY(0)' },
+              '50%': { transform: 'translateY(-6px)' },
+            },
+            float: {
+              '0%, 100%': { transform: 'translateY(0px)' },
+              '50%': { transform: 'translateY(-4px)' },
+            },
+            springIn: {
+              '0%': { opacity: 0, transform: 'scale(0.92) translateY(8px)' },
+              '100%': { opacity: 1, transform: 'scale(1) translateY(0)' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    /* 弹性曲线与微交互 */
+    :root {
+      --spring-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
+      --smooth-easing: cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* 滚动条定制 */
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #070b14;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #1e293b;
+      border-radius: 9999px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: #334155;
+    }
+
+    /* 玻璃态微光质感卡片 */
+    .glass-card {
+      background: rgba(15, 23, 42, 0.72);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.28s var(--spring-easing);
+    }
+    .glass-card:hover {
+      border-color: rgba(99, 102, 241, 0.35);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.5), 0 0 20px -5px rgba(99, 102, 241, 0.15);
+    }
+
+    /* 顶级交互弹性按钮 */
+    .btn-spring {
+      transition: all 0.2s var(--spring-easing);
+    }
+    .btn-spring:hover {
+      transform: translateY(-1px) scale(1.02);
+    }
+    .btn-spring:active {
+      transform: translateY(1px) scale(0.97);
+    }
+
+    /* Checkbox 复选框弹簧勾选效果 */
+    .custom-checkbox {
+      appearance: none;
+      width: 1.15rem;
+      height: 1.15rem;
+      border-radius: 0.375rem;
+      border: 1.5px solid #334155;
+      background-color: #0b1120;
+      cursor: pointer;
+      display: inline-grid;
+      place-content: center;
+      transition: all 0.22s var(--spring-easing);
+      flex-shrink: 0;
+    }
+    .custom-checkbox::before {
+      content: "";
+      width: 0.65rem;
+      height: 0.65rem;
+      transform: scale(0);
+      transition: 0.18s transform var(--spring-easing);
+      box-shadow: inset 1em 1em #ffffff;
+      transform-origin: center;
+      clip-path: polygon(14% 44%, 0 65%, 50% 100%, 100% 16%, 80% 0%, 43% 62%);
+    }
+    .custom-checkbox:checked {
+      background-color: #4f46e5;
+      border-color: #6366f1;
+      box-shadow: 0 0 10px rgba(99, 102, 241, 0.4);
+      transform: scale(1.05);
+    }
+    .custom-checkbox:checked::before {
+      transform: scale(1);
+    }
+
+    /* 火花光晕 */
+    .glow-flame {
+      filter: drop-shadow(0 0 14px rgba(249, 115, 22, 0.55));
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-200 relative overflow-x-hidden">
+
+  <!-- 背景流光高斯模糊氛围灯 (Ambient Glow Orbs) -->
+  <div class="fixed top-[-10%] left-[-5%] w-[450px] h-[450px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse-slow"></div>
+  <div class="fixed top-[30%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
+  <div class="fixed bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+
+  <!-- 顶部导航栏 (高斯模糊毛玻璃) -->
+  <header class="sticky top-0 z-40 backdrop-blur-2xl bg-slate-950/75 border-b border-white/5 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+      <!-- 标志与系统名 -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-amber-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 text-white font-black text-lg tracking-wider transform hover:rotate-3 transition-transform cursor-pointer">
+          F3
+        </div>
+        <div>
+          <h1 class="font-bold text-base sm:text-lg text-slate-100 tracking-tight leading-none">
+            丘祥Form3学习进度报告
+          </h1>
+        </div>
+      </div>
+
+      <!-- 快捷操作与备份 -->
+      <div class="flex items-center gap-2">
+        <button id="btn-export-json" title="导出备份 JSON" class="btn-spring inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+          </svg>
+          <span class="hidden md:inline">导出备份</span>
+        </button>
+
+        <label for="input-import-json" title="导入备份 JSON" class="btn-spring cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm">
+          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+          </svg>
+          <span class="hidden md:inline">导入数据</span>
+          <input type="file" id="input-import-json" accept=".json" class="hidden">
+        </label>
+
+        <button id="btn-reset-all" title="重置全部数据" class="btn-spring inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-red-950/40 hover:bg-red-900/60 text-red-400 hover:text-red-300 border border-red-800/40">
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+          </svg>
+          <span class="hidden lg:inline">重置</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- 主体容器 -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+    <!-- 顶部数据看板网格 (4大玻璃态卡片) -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      
+      <!-- 模块一：🔥 每日打卡与连胜火花卡片 -->
+      <div class="glass-card relative overflow-hidden rounded-2xl p-4 flex flex-col justify-between border-amber-500/20">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-semibold tracking-wide uppercase text-amber-400 flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-amber-500 animate-pulse"></span>
+              Flame Streak 连胜
+            </span>
+            <div class="mt-1.5 flex items-baseline gap-2">
+              <span id="streak-days-display" class="text-3xl font-extrabold text-white tracking-tight">0</span>
+              <span class="text-xs text-slate-400">天连胜</span>
+            </div>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-amber-500/10 border border-amber-500/25 flex items-center justify-center text-2xl glow-flame animate-bounce-soft">
+            🔥
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-white/5 flex items-center justify-between gap-2">
+          <div class="text-[11px] text-slate-400 truncate" id="streak-status-hint">
+            今日尚未打卡
+          </div>
+          <button id="btn-streak-checkin" class="btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-md shadow-orange-500/20 disabled:opacity-50 disabled:pointer-events-none whitespace-nowrap">
+            今日打卡 🔥
+          </button>
+        </div>
+      </div>
+
+      <!-- 模块二：📊 全局 11 科总进度卡片 -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-indigo-500/20">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-semibold tracking-wide uppercase text-indigo-400 flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-indigo-500"></span>
+              全局学业完成度
+            </span>
+            <div class="mt-1.5 flex items-baseline gap-2">
+              <span id="global-progress-percent" class="text-3xl font-extrabold text-white tracking-tight">0%</span>
+              <span id="global-progress-fraction" class="text-xs text-slate-400 font-medium">0 / 0 Bab</span>
+            </div>
+          </div>
+          <div class="w-11 h-11 rounded-xl bg-indigo-500/10 border border-indigo-500/25 flex items-center justify-center text-indigo-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+            </svg>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-white/5">
+            <div id="global-progress-bar" class="bg-gradient-to-r from-indigo-500 via-purple-500 to-emerald-400 h-2 rounded-full transition-all duration-700 ease-[cubic-bezier(0.34,1.56,0.64,1)]" style="width: 0%"></div>
+          </div>
+          <div class="flex justify-between items-center text-[10px] text-slate-400 mt-1.5">
+            <span>11 科全大纲</span>
+            <span id="global-remaining-text" class="text-indigo-300 font-medium">待完成: 0 章节</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 模块三：🎯 UASA 备考均分与评级卡片 (彻底解决重叠排版错误) -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-emerald-500/20">
+        <!-- 顶行：标题与图标分列两端 -->
+        <div class="flex items-center justify-between">
+          <span class="text-[11px] font-semibold tracking-wide uppercase text-emerald-400 flex items-center gap-1.5">
+            <span class="inline-block w-2 h-2 rounded-full bg-emerald-500"></span>
+            UASA 模拟总评
+          </span>
+          <div class="w-11 h-11 rounded-xl bg-emerald-500/10 border border-emerald-500/25 flex items-center justify-center text-emerald-400">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+          </div>
+        </div>
+
+        <!-- 中行：分数与评级徽章，各自舒展不挤压 -->
+        <div class="mt-2 flex items-center justify-between gap-2">
+          <div class="flex items-baseline gap-1.5">
+            <span id="uasa-average-display" class="text-3xl font-extrabold text-white tracking-tight">--</span>
+            <span class="text-xs text-slate-400">平均分</span>
+          </div>
+          <div id="uasa-overall-grade-badge" class="px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800/80 text-slate-400 border border-white/5 transition-all duration-300">
+            未录入
+          </div>
+        </div>
+
+        <!-- 底行：已记录科数与跳转快捷链 -->
+        <div class="mt-3 pt-2.5 border-t border-white/5 flex items-center justify-between text-xs">
+          <div class="text-slate-400 flex items-center gap-1" id="uasa-recorded-count">
+            已记录: 0 / 11 科
+          </div>
+          <a href="#uasa-section" class="text-emerald-400 hover:text-emerald-300 font-medium inline-flex items-center gap-1 text-[11px] transition-colors">
+            登记成绩 &rarr;
+          </a>
+        </div>
+      </div>
+
+      <!-- 模块四：⏳ 备考倒数与领跑/待冲刺诊断卡片 -->
+      <div class="glass-card rounded-2xl p-4 flex flex-col justify-between border-cyan-500/20">
+        <div class="flex items-start justify-between">
+          <div>
+            <span class="text-[11px] font-semibold tracking-wide uppercase text-cyan-400 flex items-center gap-1.5">
+              <span class="inline-block w-2 h-2 rounded-full bg-cyan-500"></span>
+              UASA 备考倒计时
+            </span>
+            <div class="mt-1.5 flex items-baseline gap-2">
+              <span id="exam-countdown-days" class="text-3xl font-extrabold text-white tracking-tight">--</span>
+              <span class="text-xs text-slate-400">天 冲刺</span>
+            </div>
+          </div>
+          <!-- 目标日期修改快捷触发 -->
+          <button id="btn-edit-exam-date" title="设置目标考试日期" class="btn-spring w-11 h-11 rounded-xl bg-cyan-500/10 border border-cyan-500/25 flex items-center justify-center text-cyan-400 hover:bg-cyan-500/20">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+          </button>
+        </div>
+
+        <div class="mt-3 pt-2.5 border-t border-white/5 space-y-1 text-xs">
+          <!-- 智能诊断：全科通关时展示特殊贺词，避免漏洞 -->
+          <div id="diagnostic-status-container" class="space-y-1">
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-400">领跑先锋:</span>
+              <span id="best-subject-tag" class="font-semibold text-emerald-400 truncate max-w-[120px]">--</span>
+            </div>
+            <div class="flex items-center justify-between gap-2">
+              <span class="text-slate-400">待冲刺科:</span>
+              <span id="lagging-subject-tag" class="font-semibold text-amber-400 truncate max-w-[120px]">--</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- 过滤器与控制栏 (毛玻璃) -->
+    <div class="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 p-3 rounded-2xl glass-card">
+      <!-- 科目分组过滤标签 -->
+      <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="filter-tabs">
+        <button data-filter="all" class="filter-btn active btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/30">
+          全部科目 (11)
+        </button>
+        <button data-filter="dlp" class="filter-btn btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          DLP 数理 (2)
+        </button>
+        <button data-filter="languages" class="filter-btn btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          语文类 (3)
+        </button>
+        <button data-filter="humanities" class="filter-btn btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60">
+          人文与技能 (6)
+        </button>
+      </div>
+
+      <!-- 搜索框与折叠控制 -->
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1 sm:w-64">
+          <input type="text" id="input-search" placeholder="搜索章节或科目 (e.g. Indices, Carta)..." class="w-full bg-slate-950/80 border border-slate-700/60 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all">
+          <svg class="w-3.5 h-3.5 text-slate-500 absolute left-2.5 top-1/2 -translate-y-1/2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/>
+          </svg>
+        </div>
+        <button id="btn-toggle-all-cards" class="btn-spring px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800/80 hover:bg-slate-700 text-slate-300 border border-white/5 whitespace-nowrap">
+          折叠全部
+        </button>
+      </div>
+    </div>
+
+    <!-- 11科章节清单卡片网格 -->
+    <section id="subjects-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 items-start">
+      <!-- 动态注入 11 科卡片 (仅初始化或切换标签时重绘，勾选时不销毁) -->
+    </section>
+
+    <!-- 模块三：UASA 模拟成绩记录与分级判定专区 (毛玻璃玻璃板) -->
+    <section id="uasa-section" class="glass-card rounded-2xl p-5 sm:p-6 space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-white/5">
+        <div>
+          <div class="flex items-center gap-2">
+            <h2 class="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <span class="w-2 h-5 rounded-full bg-emerald-500"></span>
+              UASA 模拟考成绩管理与分级
+            </h2>
+            <span class="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/25 font-medium">
+              Menengah Rendah 官方标尺
+            </span>
+          </div>
+          <p class="text-xs text-slate-400 mt-1">
+            输入 0 - 100 分数，系统实时毫秒级换算 Gred A ~ F 官方评级，不跳焦、不收起软键盘。
+          </p>
+        </div>
+
+        <!-- 官方标尺图例徽章 -->
+        <div class="flex flex-wrap items-center gap-1.5 text-[10px]">
+          <span class="px-2 py-0.5 rounded-md bg-emerald-950/80 text-emerald-300 border border-emerald-700/60 font-semibold">A: 85-100</span>
+          <span class="px-2 py-0.5 rounded-md bg-sky-950/80 text-sky-300 border border-sky-700/60 font-semibold">B: 70-84</span>
+          <span class="px-2 py-0.5 rounded-md bg-amber-950/80 text-amber-300 border border-amber-700/60 font-semibold">C: 60-69</span>
+          <span class="px-2 py-0.5 rounded-md bg-orange-950/80 text-orange-300 border border-orange-700/60 font-semibold">D: 50-59</span>
+          <span class="px-2 py-0.5 rounded-md bg-pink-950/80 text-pink-300 border border-pink-700/60 font-semibold">E: 40-49</span>
+          <span class="px-2 py-0.5 rounded-md bg-red-950/80 text-red-300 border border-red-700/60 font-semibold">F: 0-39</span>
+        </div>
+      </div>
+
+      <!-- 成绩录入网格表单 (每个科目固定容器，输入时不整体重绘) -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="uasa-score-cards">
+        <!-- 动态生成 9 科录入卡片 -->
+      </div>
+
+      <!-- 成绩汇总分析板 -->
+      <div class="p-4 rounded-xl bg-slate-950/70 border border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div class="flex flex-wrap items-center gap-2" id="grade-distribution-pills">
+          <!-- 动态注入各等第统计标签 -->
+        </div>
+        <div class="flex items-center gap-4 text-xs">
+          <div class="text-slate-400">
+            综合及格率 (A-E): <span id="uasa-pass-rate" class="text-emerald-400 font-bold ml-1 text-sm">0%</span>
+          </div>
+          <button id="btn-clear-scores" class="btn-spring text-xs text-red-400 hover:text-red-300 px-2 py-1 rounded bg-red-950/30 hover:bg-red-900/40 border border-red-900/40 transition">
+            清空所有成绩
+          </button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- 轻量倒计时设置弹窗 (Modal) -->
+  <div id="modal-exam-date" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="glass-card w-full max-w-sm rounded-2xl p-5 space-y-4 border border-indigo-500/30 shadow-2xl transform scale-95 transition-transform duration-300">
+      <div class="flex items-center justify-between">
+        <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+          <span>📅</span> 设置 UASA 模拟考目标日期
+        </h3>
+        <button id="btn-close-date-modal" class="text-slate-400 hover:text-slate-200">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/></svg>
+        </button>
+      </div>
+      <p class="text-xs text-slate-400">
+        设置您的学校校历考试日期，系统将每日自动更新剩余备战天数。
+      </p>
+      <div>
+        <input type="date" id="input-target-date" class="w-full bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-indigo-500">
+      </div>
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="btn-save-exam-date" class="btn-spring px-4 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white shadow-md shadow-indigo-600/30">
+          保存日期
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 轻量单科清空确认弹窗 (Modal - 避免移动端误触) -->
+  <div id="modal-confirm-uncheck" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm hidden opacity-0 transition-opacity duration-300">
+    <div class="glass-card w-full max-w-sm rounded-2xl p-5 space-y-4 border border-amber-500/30 shadow-2xl transform scale-95 transition-transform duration-300">
+      <div class="flex items-center gap-2.5 text-amber-400">
+        <div class="w-8 h-8 rounded-lg bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+          ⚠️
+        </div>
+        <h3 class="font-bold text-sm text-slate-100">确认清空进度？</h3>
+      </div>
+      <p class="text-xs text-slate-300 leading-relaxed" id="confirm-uncheck-text">
+        您确定要重置该科目的所有已勾选章节吗？该操作不可撤销。
+      </p>
+      <div class="flex justify-end gap-2 pt-2">
+        <button id="btn-cancel-uncheck" class="btn-spring px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300">
+          取消
+        </button>
+        <button id="btn-proceed-uncheck" class="btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-red-600 hover:bg-red-500 text-white shadow-md shadow-red-600/30">
+          确定清空
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 底部信息 -->
+  <footer class="mt-12 py-6 border-t border-white/5 text-center text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>🇲🇾 Malaysia Form 3 KSSM Academic Progress Tracker • 个人量化备战系统</p>
+      <p class="text-[11px] text-slate-600">支持接入 Supabase 云端同步与 GitHub Pages 托管</p>
+    </div>
+  </footer>
+
+  <!-- 提示弹窗 (Toast) -->
+  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+
+  <!-- 核心数据与业务逻辑 -->
+  <script>
+    /**
+     * Form 3 (中三 KSSM) 11科完整真实大纲数据库
+     * MM与SC严格使用英文DLP命名，其余使用官方标准马来文/中文大纲
+     */
+    const KSSM_SUBJECTS_DATA = [
+      {
+        id: 'mm',
+        code: 'MM',
+        name: 'Mathematics',
+        subtitle: 'DLP (Dual Language Programme)',
+        category: 'dlp',
+        badgeColor: 'from-blue-600 to-indigo-600',
+        chapters: [
+          'Chapter 1: Indices',
+          'Chapter 2: Standard Form',
+          'Chapter 3: Consumer Mathematics: Savings and Investments, Credit and Debt',
+          'Chapter 4: Scale Drawings',
+          'Chapter 5: Trigonometric Ratios',
+          'Chapter 6: Angles and Tangents of Circles',
+          'Chapter 7: Plans and Elevations',
+          'Chapter 8: Loci in Two Dimensions',
+          'Chapter 9: Straight Lines'
+        ]
+      },
+      {
+        id: 'sc',
+        code: 'SC',
+        name: 'Science',
+        subtitle: 'DLP (Dual Language Programme)',
+        category: 'dlp',
+        badgeColor: 'from-emerald-600 to-teal-600',
+        chapters: [
+          'Chapter 1: Stimuli and Responses',
+          'Chapter 2: Respiration',
+          'Chapter 3: Transportation',
+          'Chapter 4: Reactivity of Metals',
+          'Chapter 5: Thermochemistry',
+          'Chapter 6: Electricity and Magnetism',
+          'Chapter 7: Energy and Power',
+          'Chapter 8: Radioactivity',
+          'Chapter 9: Space Weather',
+          'Chapter 10: Space Exploration'
+        ]
+      },
+      {
+        id: 'bm',
+        code: 'BM',
+        name: 'Bahasa Melayu',
+        subtitle: 'KSSM Tingkatan 3 Tema & Komsas',
+        category: 'languages',
+        badgeColor: 'from-amber-600 to-yellow-600',
+        chapters: [
+          'Bab 1: Tema 1 - Suluh Masa Depan',
+          'Bab 2: Tema 2 - Bersih Selalu, Sihat Sentiasa',
+          'Bab 3: Tema 3 - Kecerdasan Pelbagai',
+          'Bab 4: Tema 4 - Waspada Selalu',
+          'Bab 5: Tema 5 - Dirgahayu Negaraku',
+          'Bab 6: Tema 6 - Integriti Tinggi, Sahsiah Terpuji',
+          'Bab 7: Tema 7 - Persaudaraan Tanpa Sempadan',
+          'Bab 8: Tema 8 - Subur Bahasa, Mekar Sastera',
+          'Bab 9: Tema 9 - Indah Seni, Semarak Budaya',
+          'Bab 10: Tema 10 - Sains dan Teknologi Pemacu Kemodenan',
+          'Bab 11: Tema 11 - Alam Anugerah Terindah',
+          'Bab 12: Tema 12 - Tuah di Bumi Permata',
+          'Bab 13: Tema 13 - Perindustrian',
+          'Bab 14: Tema 14 - Ekonomi Mapan, Negara Makmur',
+          'Bab 15: Tema 15 - Destinasi Misteri',
+          'Bab 16: Tema 16 - Mencapai Impian, Menemui Kejayaan',
+          'Bab 17: Tema 17 - Pelancongan',
+          'Bab 18: Tema 18 - Sejarah dan Warisan',
+          'Bab 19: Komsas - Puisi Tradisional & Moden (Sajak)',
+          'Bab 20: Komsas - Prosa Tradisional & Cerpen',
+          'Bab 21: Komsas - Drama & Novel Tingkatan 3'
+        ]
+      },
+      {
+        id: 'bi',
+        code: 'BI',
+        name: 'English Language',
+        subtitle: 'CEFR Aligned Form 3 KSSM',
+        category: 'languages',
+        badgeColor: 'from-sky-600 to-cyan-600',
+        chapters: [
+          'Unit 1: Family Ties',
+          'Unit 2: Food, Food, Food!',
+          'Unit 3: The Wonders of Nature',
+          'Unit 4: Special Relationships',
+          'Unit 5: A Place to Call Home',
+          'Unit 6: Ready, Steady, Go!',
+          'Unit 7: Extreme Situations',
+          'Unit 8: Time to Spare',
+          'Unit 9: High-Tech World',
+          'Unit 10: That\'s Entertainment',
+          'Unit 11: Lessons to Learn',
+          'Unit 12: The Body Beautiful',
+          'Literature Component: Poems & Short Stories',
+          'Literature Component: Form 3 Novel Study'
+        ]
+      },
+      {
+        id: 'bc',
+        code: 'BC',
+        name: '华文 (Bahasa Cina)',
+        subtitle: 'KSSM 中三华文核心单元',
+        category: 'languages',
+        badgeColor: 'from-rose-600 to-red-600',
+        chapters: [
+          '单元一：门开着（现代诗歌与散文）',
+          '单元二：心灵共鸣（写人记事与情感抒发）',
+          '单元三：行走的风景（自然与人文游记）',
+          '单元四：生命密码（人与自然／科学小品）',
+          '单元五：浩瀚星河（古典文学诗词精粹）',
+          '单元六：书香溢彩（读书感悟与名著导读）',
+          '单元七：世事洞明（社会杂感与思辨杂文）',
+          '单元八：风月同天（文言经典与传世寓言）',
+          '单元九：传统薪火（文化民俗与民族记忆）',
+          '单元十：思辨之光（演说与辩论驳论文）',
+          '单元十一：人间烟火（亲情乡土与人间百态）',
+          '单元十二：岁月如歌（成长纪实与人生哲理）',
+          '古诗文积累：文言虚词、实词与名句默写',
+          '写作与应用：中三公函与通告规范'
+        ]
+      },
+      {
+        id: 'geo',
+        code: 'GEO',
+        name: 'Geografi',
+        subtitle: 'KSSM Kemahiran Geografi & Fizikal/Manusia',
+        category: 'humanities',
+        badgeColor: 'from-teal-600 to-emerald-600',
+        chapters: [
+          'Bab 1: Jadual dan Graf',
+          'Bab 2: Carta Pai',
+          'Bab 3: Pengaruh Persekitaran Fizikal Terhadap Tumbuh-tumbuhan Semula Jadi & Hidupan Liar',
+          'Bab 4: Tumbuh-tumbuhan Semula Jadi di Malaysia',
+          'Bab 5: Hidupan Liar di Malaysia',
+          'Bab 6: Sumber Semula Jadi di Malaysia',
+          'Bab 7: Kegiatan Ekonomi di Malaysia',
+          'Bab 8: Tumbuh-tumbuhan Semula Jadi dan Hidupan Liar di Dunia',
+          'Bab 9: Sumber Semula Jadi Utama di Dunia',
+          'Bab 10: Kerjasama Ekonomi Antarabangsa',
+          'Bab 11: Kitar Semula'
+        ]
+      },
+      {
+        id: 'ask',
+        code: 'ASK',
+        name: 'Asas Sains Komputer',
+        subtitle: 'KSSM Tingkatan 3 Pemikiran Komputasional',
+        category: 'humanities',
+        badgeColor: 'from-violet-600 to-purple-600',
+        chapters: [
+          'Bab 1: Konsep Asas Pemikiran Komputasional (Pembangunan Algoritma & Ujian Kualiti)',
+          'Bab 2: Kriptografi dalam Keselamatan Data (Sifer Caesar, Pigpen, Rail Fence, Reverse Cipher)',
+          'Bab 3: Struktur Kod Arahan (Pengaturcaraan Lanjutan & Logik Kod)',
+          'Bab 4: Pembangunan Aplikasi Web Interaktif (Asas HTML, CSS & JavaScript)'
+        ]
+      },
+      {
+        id: 'pm',
+        code: 'PM',
+        name: 'Pendidikan Moral',
+        subtitle: 'KSSM Nilai Moral Menengah Rendah',
+        category: 'humanities',
+        badgeColor: 'from-fuchsia-600 to-pink-600',
+        chapters: [
+          'Unit 1: Pilihan Bermoral Pilihan Bersama',
+          'Unit 2: Anjakan Paradigma Kejayaan Bersama',
+          'Unit 3: Hidup Beretika Hidup Sejahtera',
+          'Unit 4: Hidup Berintegriti Tonggak Kejayaan',
+          'Unit 5: Keluarga Bahagia Komuniti Sejahtera',
+          'Unit 6: Sahabat Positif Sahabat Sejati',
+          'Unit 7: Persaudaraan Menjamin Keharmonian',
+          'Unit 8: Amalan Tradisi Kekeluargaan Khazanah Bangsa',
+          'Unit 9: Kelestarian Alam Tanggungjawab Bersama',
+          'Unit 10: Sayangi Flora dan Fauna',
+          'Unit 11: Kekalkan Warisan Sejarah Budaya Kita',
+          'Unit 12: Integriti Membentuk Modal Insan Gemilang'
+        ]
+      },
+      {
+        id: 'pk',
+        code: 'PK',
+        name: 'Pendidikan Kesihatan',
+        subtitle: 'PJPK Komponen Pendidikan Kesihatan & Pertolongan Cemas',
+        category: 'humanities',
+        badgeColor: 'from-lime-600 to-green-600',
+        chapters: [
+          'Unit 1: PEERS - Gender & Stereotaip Peranan Gender',
+          'Unit 2: PEERS - Kemahiran Mengurus Tekanan & Konflik Diri',
+          'Unit 3: PEERS - Sumbang Mahram & Jerat Seksual Siber',
+          'Unit 4: PEERS - Penolakan Pengaruh Penyalahgunaan Bahan (Dadah, Alkohol, Inhalan)',
+          'Unit 5: Pemakanan - Pemakanan Sihat, Kalori & Diet Seimbang Remaja',
+          'Unit 6: Pertolongan Cemas - Prinsip dan Prosedur R.I.C.E. untuk Kecederaan',
+          'Unit 7: Pertolongan Cemas - Prosedur Asas C.P.R. (Cardiopulmonary Resuscitation)',
+          'Unit 8: Keselamatan - Pengurusan Risiko & Pencegahan Kemalangan Komuniti'
+        ]
+      },
+      {
+        id: 'sej',
+        code: 'SEJ',
+        name: 'Sejarah',
+        subtitle: 'KSSM Kedatangan Kuasa Barat & Penentangan',
+        category: 'humanities',
+        badgeColor: 'from-amber-700 to-red-700',
+        chapters: [
+          'Bab 1: Kedatangan Kuasa Barat',
+          'Bab 2: Pentadbiran Negeri-negeri Selat',
+          'Bab 3: Pentadbiran Negeri-negeri Melayu Bersekutu',
+          'Bab 4: Pentadbiran Negeri-negeri Melayu Tidak Bersekutu',
+          'Bab 5: Pentadbiran Barat di Sarawak dan Sabah',
+          'Bab 6: Kesan Pentadbiran Barat Terhadap Ekonomi dan Sosial',
+          'Bab 7: Penentangan Masyarakat Tempatan',
+          'Bab 8: Kebijaksanaan Raja dan Pembesar Melayu Menangani Cabaran Barat'
+        ]
+      },
+      {
+        id: 'psv',
+        code: 'PSV',
+        name: 'Pendidikan Seni Visual',
+        subtitle: 'KSSM Seni Halus, Reka Bentuk, Seni Kraf & Komunikasi Visual',
+        category: 'humanities',
+        badgeColor: 'from-pink-600 to-rose-600',
+        chapters: [
+          'Tajuk 1: Pakaian Tradisional dan Perhiasan Diri',
+          'Tajuk 2: Seni Lukisan (Media Campuran)',
+          'Tajuk 3: Seni Catan (Media Cat Air / Akrilik / Minyak)',
+          'Tajuk 4: Seni Arca (Arca Luakan, Tambahan, Binaan & Timbulan)',
+          'Tajuk 5: Reka Bentuk Landskap',
+          'Tajuk 6: Reka Bentuk Hiasan Dalaman',
+          'Tajuk 7: Reka Bentuk Industri',
+          'Tajuk 8: Seni Tekad',
+          'Tajuk 9: Seni Anyaman',
+          'Tajuk 10: Seni Reka Grafik - Tipografi',
+          'Tajuk 11: Seni Foto - Kamera dan Peranti Pengimejan'
+        ]
+      }
+    ];
+
+    /**
+     * 马来西亚中三 (Menengah Rendah) 官方标准评分标尺
+     */
+    const GRADE_CONFIG = [
+      { min: 85, max: 100, grade: 'Gred A', label: 'Cemerlang', color: 'text-emerald-400', bg: 'bg-emerald-950/80 border-emerald-700/60' },
+      { min: 70, max: 84,  grade: 'Gred B', label: 'Kepujian',  color: 'text-sky-400',     bg: 'bg-sky-950/80 border-sky-700/60' },
+      { min: 60, max: 69,  grade: 'Gred C', label: 'Baik',      color: 'text-amber-400',   bg: 'bg-amber-950/80 border-amber-700/60' },
+      { min: 50, max: 59,  grade: 'Gred D', label: 'Memuaskan', color: 'text-orange-400',  bg: 'bg-orange-950/80 border-orange-700/60' },
+      { min: 40, max: 49,  grade: 'Gred E', label: 'Tahap Min', color: 'text-pink-400',    bg: 'bg-pink-950/80 border-pink-700/60' },
+      { min: 0,  max: 39,  grade: 'Gred F', label: 'Belum Capai', color: 'text-red-400',   bg: 'bg-red-950/80 border-red-700/60' },
+    ];
+
+    function calculateGrade(score) {
+      if (score === null || score === undefined || score === '' || isNaN(score)) {
+        return null;
+      }
+      const num = Number(score);
+      for (const rule of GRADE_CONFIG) {
+        if (num >= rule.min && num <= rule.max) {
+          return rule;
+        }
+      }
+      return GRADE_CONFIG[GRADE_CONFIG.length - 1];
+    }
+
+    /**
+     * 数据服务层 (已适配 Supabase 云端接入插槽)
+     */
+    const STORAGE_KEY = 'KSSM_F3_TRACKER_V2';
+
+    // 预留的 Supabase 云端同步配置插槽
+    const SUPABASE_CONFIG = {
+      url: '', // e.g. 'https://your-project.supabase.co'
+      anonKey: '', // e.g. 'eyJhbGci...'
+      enabled: false,
+      tableName: 'student_progress'
+    };
+
+    class AppState {
+      constructor() {
+        this.data = {
+          streak: {
+            days: 0,
+            lastCheckInDate: null,
+            history: []
+          },
+          targetExamDate: '2026-12-15', // 默认初三年末 UASA
+          progress: {}, // { [subjectId]: [chapterIdx, ...] }
+          scores: {},   // { [subjectId]: number }
+          collapsed: {},
+          activeFilter: 'all',
+          searchQuery: ''
+        };
+        this.load();
+      }
+
+      load() {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (raw) {
+            const parsed = JSON.parse(raw);
+            this.data = Object.assign(this.data, parsed);
+          }
+        } catch (e) {
+          console.error('加载本地存储异常:', e);
+        }
+        this.validateStreak();
+      }
+
+      save() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+          // 如开启 Supabase 则异步推送到云端
+          if (SUPABASE_CONFIG.enabled && typeof window.syncToSupabase === 'function') {
+            window.syncToSupabase(this.data);
+          }
+        } catch (e) {
+          console.error('保存本地失败:', e);
+        }
+      }
+
+      validateStreak() {
+        const todayStr = this.getTodayDateString();
+        const last = this.data.streak.lastCheckInDate;
+        if (!last) return;
+
+        const diffDays = this.getDaysDifference(last, todayStr);
+        if (diffDays > 1) {
+          this.data.streak.days = 0;
+          this.save();
+        }
+      }
+
+      getTodayDateString() {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+      }
+
+      getDaysDifference(dateStr1, dateStr2) {
+        const d1 = new Date(dateStr1 + 'T00:00:00');
+        const d2 = new Date(dateStr2 + 'T00:00:00');
+        const diffTime = Math.abs(d2.getTime() - d1.getTime());
+        return Math.round(diffTime / (1000 * 60 * 60 * 24));
+      }
+
+      checkInToday() {
+        const todayStr = this.getTodayDateString();
+        const last = this.data.streak.lastCheckInDate;
+
+        if (last === todayStr) {
+          return { success: false, message: '今天已经完成打卡啦！' };
+        }
+
+        const diffDays = last ? this.getDaysDifference(last, todayStr) : 999;
+        if (diffDays === 1) {
+          this.data.streak.days += 1;
+        } else {
+          this.data.streak.days = 1;
+        }
+
+        this.data.streak.lastCheckInDate = todayStr;
+        if (!this.data.streak.history.includes(todayStr)) {
+          this.data.streak.history.push(todayStr);
+        }
+
+        this.save();
+        return { success: true, days: this.data.streak.days };
+      }
+
+      toggleChapter(subjectId, chapterIdx) {
+        if (!this.data.progress[subjectId]) {
+          this.data.progress[subjectId] = [];
+        }
+        const list = this.data.progress[subjectId];
+        const idx = list.indexOf(chapterIdx);
+        let checked = false;
+        if (idx >= 0) {
+          list.splice(idx, 1);
+          checked = false;
+        } else {
+          list.push(chapterIdx);
+          checked = true;
+        }
+        this.save();
+        return checked;
+      }
+
+      batchCheckSubject(subjectId, checkAll) {
+        const sub = KSSM_SUBJECTS_DATA.find(s => s.id === subjectId);
+        if (!sub) return;
+        if (checkAll) {
+          this.data.progress[subjectId] = sub.chapters.map((_, i) => i);
+        } else {
+          this.data.progress[subjectId] = [];
+        }
+        this.save();
+      }
+
+      setScore(subjectId, scoreValue) {
+        if (scoreValue === '' || scoreValue === null || isNaN(scoreValue)) {
+          delete this.data.scores[subjectId];
+        } else {
+          const num = Math.min(100, Math.max(0, Math.round(Number(scoreValue))));
+          this.data.scores[subjectId] = num;
+        }
+        this.save();
+      }
+
+      clearAllScores() {
+        this.data.scores = {};
+        this.save();
+      }
+
+      resetAll() {
+        this.data = {
+          streak: { days: 0, lastCheckInDate: null, history: [] },
+          targetExamDate: '2026-12-15',
+          progress: {},
+          scores: {},
+          collapsed: {},
+          activeFilter: 'all',
+          searchQuery: ''
+        };
+        this.save();
+      }
+    }
+
+    const state = new AppState();
+
+    // 待清空的科目暂存变量 (用于防误触弹窗)
+    let pendingUncheckSubjectId = null;
+
+    /**
+     * UI 初始化与渲染
+     */
+    function init() {
+      renderStreakModule();
+      renderCountdownModule();
+      renderGlobalStats();
+      renderSubjectsGrid(); // 初次构建 9 科卡片
+      renderUasaModule(true); // 初次构建 UASA 卡片
+      bindGlobalEvents();
+    }
+
+    // 模块一：渲染火花打卡状态
+    function renderStreakModule() {
+      const todayStr = state.getTodayDateString();
+      const last = state.data.streak.lastCheckInDate;
+      const isCheckedToday = (last === todayStr);
+
+      const daysDisplay = document.getElementById('streak-days-display');
+      const hintDisplay = document.getElementById('streak-status-hint');
+      const btnCheckIn = document.getElementById('btn-streak-checkin');
+
+      daysDisplay.textContent = state.data.streak.days;
+
+      if (isCheckedToday) {
+        hintDisplay.innerHTML = `<span class="text-emerald-400 font-medium">✓ 今日已完成打卡</span>`;
+        btnCheckIn.disabled = true;
+        btnCheckIn.textContent = '已打卡 ✓';
+        btnCheckIn.className = 'btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-emerald-950/80 text-emerald-400 border border-emerald-700/60 cursor-default opacity-90';
+      } else {
+        btnCheckIn.disabled = false;
+        btnCheckIn.textContent = '今日打卡 🔥';
+        btnCheckIn.className = 'btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 shadow-md shadow-orange-500/20 whitespace-nowrap';
+        hintDisplay.textContent = state.data.streak.days > 0 ? '保持连胜，快来打卡！' : '今日尚未打卡，立即开启';
+      }
+    }
+
+    // 模块四：备考倒计时计算与渲染
+    function renderCountdownModule() {
+      const targetStr = state.data.targetExamDate || '2026-12-15';
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const target = new Date(targetStr + 'T00:00:00');
+      
+      const diffTime = target.getTime() - today.getTime();
+      const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+      const daysEl = document.getElementById('exam-countdown-days');
+      if (diffDays > 0) {
+        daysEl.textContent = diffDays;
+      } else if (diffDays === 0) {
+        daysEl.textContent = '0';
+      } else {
+        daysEl.textContent = '已完赛';
+      }
+    }
+
+    // 模块二：全局进度与强弱科诊断 (修复 100% 仍显示待冲刺科漏洞)
+    function renderGlobalStats() {
+      let totalChapters = 0;
+      let completedChapters = 0;
+
+      let bestSub = null;
+      let bestPercent = -1;
+      let lagSub = null;
+      let lagPercent = 999;
+
+      let allHundredPercent = true;
+
+      KSSM_SUBJECTS_DATA.forEach(sub => {
+        const count = sub.chapters.length;
+        const done = (state.data.progress[sub.id] || []).length;
+        totalChapters += count;
+        completedChapters += done;
+
+        const pct = count > 0 ? (done / count) * 100 : 0;
+        if (pct < 100) {
+          allHundredPercent = false;
+        }
+
+        if (pct > bestPercent) {
+          bestPercent = pct;
+          bestSub = { name: sub.code, pct: Math.round(pct) };
+        }
+        // 只有在未完成时才计入待冲刺
+        if (pct < lagPercent && pct < 100) {
+          lagPercent = pct;
+          lagSub = { name: sub.code, pct: Math.round(pct) };
+        }
+      });
+
+      const overallPercent = totalChapters > 0 ? Math.round((completedChapters / totalChapters) * 100) : 0;
+      const remainingChapters = totalChapters - completedChapters;
+
+      document.getElementById('global-progress-percent').textContent = `${overallPercent}%`;
+      document.getElementById('global-progress-fraction').textContent = `${completedChapters} / ${totalChapters} Bab`;
+      document.getElementById('global-progress-bar').style.width = `${overallPercent}%`;
+      document.getElementById('global-remaining-text').textContent = `待完成: ${remainingChapters} 章节`;
+
+      // 强弱科诊断
+      const diagContainer = document.getElementById('diagnostic-status-container');
+      if (allHundredPercent && totalChapters > 0) {
+        diagContainer.innerHTML = `
+          <div class="py-1 px-2 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-300 font-bold flex items-center justify-center gap-1 text-center">
+            <span>🎉</span> 恭喜！11 科大纲全线通关！
+          </div>
+        `;
+      } else if (completedChapters === 0) {
+        diagContainer.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-400">领跑先锋:</span>
+            <span class="font-semibold text-slate-500">待起步</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-400">待冲刺科:</span>
+            <span class="font-semibold text-slate-500">全科待开始</span>
+          </div>
+        `;
+      } else {
+        const lagText = lagSub ? `${lagSub.name} (${lagSub.pct}%)` : '稳步推进中';
+        diagContainer.innerHTML = `
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-400">领跑先锋:</span>
+            <span class="font-semibold text-emerald-400 truncate max-w-[120px]">${bestSub.name} (${bestSub.pct}%)</span>
+          </div>
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-slate-400">待冲刺科:</span>
+            <span class="font-semibold text-amber-400 truncate max-w-[120px]">${lagText}</span>
+          </div>
+        `;
+      }
+    }
+
+    // 局部更新单科卡片的进度显示 (不重绘 DOM，保留滚动位置)
+    function updateSingleSubjectProgress(subjectId) {
+      const sub = KSSM_SUBJECTS_DATA.find(s => s.id === subjectId);
+      if (!sub) return;
+
+      const card = document.querySelector(`.subject-card[data-sub="${subjectId}"]`);
+      if (!card) return;
+
+      const doneList = state.data.progress[subjectId] || [];
+      const total = sub.chapters.length;
+      const doneCount = doneList.length;
+      const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+
+      // 1. 更新进度文字
+      const progressText = card.querySelector('.subject-progress-text');
+      if (progressText) {
+        progressText.textContent = `${doneCount} / ${total} Chapters (${pct}%)`;
+        progressText.className = `subject-progress-text font-bold ${pct === 100 ? 'text-emerald-400' : 'text-indigo-400'}`;
+      }
+
+      // 2. 更新进度条宽度
+      const progressBar = card.querySelector('.subject-progress-bar');
+      if (progressBar) {
+        progressBar.style.width = `${pct}%`;
+        progressBar.className = `subject-progress-bar h-1.5 rounded-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-gradient-to-r from-indigo-500 to-cyan-400'}`;
+      }
+
+      // 3. 通关金牌徽章
+      const trophyEl = card.querySelector('.trophy-badge');
+      if (pct === 100) {
+        if (!trophyEl) {
+          const title = card.querySelector('.subject-title');
+          if (title) {
+            const span = document.createElement('span');
+            span.className = 'trophy-badge text-emerald-400 text-xs ml-1';
+            span.title = '该科全章节已通关';
+            span.textContent = '🏆';
+            title.appendChild(span);
+          }
+        }
+      } else {
+        if (trophyEl) trophyEl.remove();
+      }
+    }
+
+    // 模块二：渲染 9 科大纲卡片 (仅初始化或筛选/搜索变动时调用)
+    function renderSubjectsGrid() {
+      const container = document.getElementById('subjects-container');
+      const filter = state.data.activeFilter;
+      const query = (state.data.searchQuery || '').trim().toLowerCase();
+
+      container.innerHTML = '';
+
+      const filteredSubjects = KSSM_SUBJECTS_DATA.filter(sub => {
+        if (filter !== 'all' && sub.category !== filter) return false;
+        return true;
+      });
+
+      if (filteredSubjects.length === 0) {
+        container.innerHTML = `
+          <div class="col-span-full py-12 text-center text-slate-500">
+            未发现与搜索匹配的科目
+          </div>
+        `;
+        return;
+      }
+
+      filteredSubjects.forEach(sub => {
+        const doneList = state.data.progress[sub.id] || [];
+        const total = sub.chapters.length;
+        const doneCount = doneList.length;
+        const pct = total > 0 ? Math.round((doneCount / total) * 100) : 0;
+        const isCollapsed = state.data.collapsed[sub.id] || false;
+
+        const matchingChapters = sub.chapters.map((title, idx) => ({ title, idx }))
+          .filter(item => {
+            if (!query) return true;
+            return item.title.toLowerCase().includes(query) || sub.name.toLowerCase().includes(query) || sub.code.toLowerCase().includes(query);
+          });
+
+        const card = document.createElement('div');
+        card.className = `subject-card glass-card rounded-2xl p-4 sm:p-5 flex flex-col justify-start transition-all duration-300 ${doneCount === total && total > 0 ? 'ring-1 ring-emerald-500/40' : ''}`;
+        card.setAttribute('data-sub', sub.id);
+
+        card.innerHTML = `
+          <!-- 卡片头 -->
+          <div class="space-y-3">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br ${sub.badgeColor} flex items-center justify-center text-white font-black text-xs shadow-md">
+                  ${sub.code}
+                </div>
+                <div>
+                  <h3 class="subject-title font-bold text-sm text-slate-100 flex items-center leading-snug">
+                    ${sub.name}
+                    ${doneCount === total && total > 0 ? '<span class="trophy-badge text-emerald-400 text-xs ml-1" title="全科已通关">🏆</span>' : ''}
+                  </h3>
+                  <p class="text-[11px] text-slate-400">${sub.subtitle}</p>
+                </div>
+              </div>
+
+              <!-- 操作控制 -->
+              <div class="flex items-center gap-1">
+                <button data-sub="${sub.id}" class="btn-check-all btn-spring text-[11px] px-2 py-0.5 rounded text-slate-400 hover:text-slate-200 bg-slate-800/80 hover:bg-slate-800">
+                  全选
+                </button>
+                <button data-sub="${sub.id}" class="btn-uncheck-all btn-spring text-[11px] px-2 py-0.5 rounded text-red-400/90 hover:text-red-300 bg-red-950/30 hover:bg-red-900/50">
+                  清空
+                </button>
+                <button data-sub="${sub.id}" class="btn-toggle-collapse btn-spring p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800/80 transition-colors" title="${isCollapsed ? '展开章节' : '收起章节'}">
+                  <svg class="w-4 h-4 transition-transform duration-300" style="transform: ${isCollapsed ? 'rotate(-90deg)' : 'rotate(0deg)'};" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- 单科进度条 -->
+            <div class="space-y-1">
+              <div class="flex justify-between text-[11px]">
+                <span class="text-slate-400 font-medium">已学进度</span>
+                <span class="subject-progress-text font-bold ${pct === 100 ? 'text-emerald-400' : 'text-indigo-400'}">
+                  ${doneCount} / ${total} Chapters (${pct}%)
+                </span>
+              </div>
+              <div class="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-white/5">
+                <div class="subject-progress-bar h-1.5 rounded-full transition-all duration-500 ${pct === 100 ? 'bg-emerald-400' : 'bg-gradient-to-r from-indigo-500 to-cyan-400'}" style="width: ${pct}%"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- 章节勾选清单 (带精致限制高度与滚动，杜绝页面拉扯) -->
+          <div class="chapter-list-container mt-4 space-y-1.5 max-h-[460px] overflow-y-auto pr-1 ${isCollapsed ? 'hidden' : ''}">
+            ${matchingChapters.length === 0 ? `
+              <div class="text-[11px] text-slate-500 py-3 text-center">无匹配搜索章节</div>
+            ` : matchingChapters.map(ch => {
+              const isChecked = doneList.includes(ch.idx);
+              return `
+                <label class="chapter-row group flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-200 border ${isChecked ? 'bg-indigo-950/30 border-indigo-500/25 text-slate-200' : 'bg-slate-950/60 border-white/5 hover:border-white/10 text-slate-300'}">
+                  <input type="checkbox" data-sub="${sub.id}" data-idx="${ch.idx}" ${isChecked ? 'checked' : ''} class="custom-checkbox mt-0.5">
+                  <span class="chapter-title-text text-xs leading-relaxed select-none ${isChecked ? 'line-through text-slate-500' : ''}">
+                    ${highlightQuery(ch.title, query)}
+                  </span>
+                </label>
+              `;
+            }).join('')}
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+
+      bindSubjectCardEvents();
+    }
+
+    function highlightQuery(text, query) {
+      if (!query) return text;
+      const regex = new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+      return text.replace(regex, '<mark class="bg-indigo-500/35 text-indigo-200 px-0.5 rounded">$1</mark>');
+    }
+
+    // 绑定科目卡片内交互事件 (精细化更新，杜绝全量重绘闪烁)
+    function bindSubjectCardEvents() {
+      // 章节 Checkbox 勾选
+      document.querySelectorAll('.custom-checkbox').forEach(cb => {
+        cb.addEventListener('change', (e) => {
+          const subId = e.target.getAttribute('data-sub');
+          const idx = parseInt(e.target.getAttribute('data-idx'), 10);
+          const isNowChecked = state.toggleChapter(subId, idx);
+
+          // 仅更新该章节视觉样式
+          const row = e.target.closest('.chapter-row');
+          const titleText = row.querySelector('.chapter-title-text');
+          if (isNowChecked) {
+            row.className = 'chapter-row group flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-200 border bg-indigo-950/30 border-indigo-500/25 text-slate-200';
+            titleText.classList.add('line-through', 'text-slate-500');
+          } else {
+            row.className = 'chapter-row group flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-200 border bg-slate-950/60 border-white/5 hover:border-white/10 text-slate-300';
+            titleText.classList.remove('line-through', 'text-slate-500');
+          }
+
+          // 仅更新单科进度条 & 顶部全局数字
+          updateSingleSubjectProgress(subId);
+          renderGlobalStats();
+        });
+      });
+
+      // 全选
+      document.querySelectorAll('.btn-check-all').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const subId = e.currentTarget.getAttribute('data-sub');
+          state.batchCheckSubject(subId, true);
+          // 同步勾选框
+          const card = document.querySelector(`.subject-card[data-sub="${subId}"]`);
+          if (card) {
+            card.querySelectorAll('.custom-checkbox').forEach(cb => {
+              cb.checked = true;
+              const row = cb.closest('.chapter-row');
+              const text = row.querySelector('.chapter-title-text');
+              row.className = 'chapter-row group flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-200 border bg-indigo-950/30 border-indigo-500/25 text-slate-200';
+              text.classList.add('line-through', 'text-slate-500');
+            });
+          }
+          updateSingleSubjectProgress(subId);
+          renderGlobalStats();
+          showToast('已全选该科所有章节', 'success');
+        });
+      });
+
+      // 清空 (防误触弹窗提示)
+      document.querySelectorAll('.btn-uncheck-all').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const subId = e.currentTarget.getAttribute('data-sub');
+          const sub = KSSM_SUBJECTS_DATA.find(s => s.id === subId);
+          pendingUncheckSubjectId = subId;
+
+          const modal = document.getElementById('modal-confirm-uncheck');
+          document.getElementById('confirm-uncheck-text').innerHTML = `您确定要清空 <span class="text-white font-bold">【${sub.name}】</span> 的所有已学进度吗？`;
+          modal.classList.remove('hidden');
+          requestAnimationFrame(() => {
+            modal.classList.remove('opacity-0');
+            modal.querySelector('div').classList.remove('scale-95');
+          });
+        });
+      });
+
+      // 折叠/展开单个卡片
+      document.querySelectorAll('.btn-toggle-collapse').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          const subId = e.currentTarget.getAttribute('data-sub');
+          const card = document.querySelector(`.subject-card[data-sub="${subId}"]`);
+          const list = card.querySelector('.chapter-list-container');
+          const svg = e.currentTarget.querySelector('svg');
+
+          const nowCollapsed = !state.data.collapsed[subId];
+          state.data.collapsed[subId] = nowCollapsed;
+          state.save();
+
+          if (nowCollapsed) {
+            list.classList.add('hidden');
+            if (svg) svg.style.transform = 'rotate(-90deg)';
+          } else {
+            list.classList.remove('hidden');
+            if (svg) svg.style.transform = 'rotate(0deg)';
+          }
+        });
+      });
+    }
+
+    // 模块三：UASA 模拟成绩管理 (彻底修复键盘失去焦点重绘问题)
+    function renderUasaModule(initialBuild = false) {
+      const container = document.getElementById('uasa-score-cards');
+
+      // 初次加载时构建卡片骨架
+      if (initialBuild) {
+        container.innerHTML = '';
+        KSSM_SUBJECTS_DATA.forEach(sub => {
+          const currentScore = state.data.scores[sub.id];
+          const hasScore = (currentScore !== undefined && currentScore !== null && currentScore !== '');
+          const gradeInfo = hasScore ? calculateGrade(currentScore) : null;
+
+          const card = document.createElement('div');
+          card.className = 'glass-card rounded-xl p-3.5 flex items-center justify-between gap-3';
+          card.setAttribute('data-uasa-sub', sub.id);
+
+          card.innerHTML = `
+            <div class="flex items-center gap-2.5 min-w-0">
+              <div class="w-8 h-8 rounded-lg bg-gradient-to-br ${sub.badgeColor} flex items-center justify-center text-white font-bold text-xs flex-shrink-0 shadow-sm">
+                ${sub.code}
+              </div>
+              <div class="min-w-0">
+                <div class="font-bold text-xs text-slate-200 truncate">${sub.name}</div>
+                <div class="text-[10px] text-slate-500">${sub.category === 'dlp' ? 'DLP 英文' : 'KSSM'}</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2.5 flex-shrink-0">
+              <!-- 分数输入框 (0-100) -->
+              <div class="relative w-16">
+                <input type="number" min="0" max="100" data-sub="${sub.id}" value="${hasScore ? currentScore : ''}" placeholder="分" class="score-input w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1 text-center text-xs font-bold text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all">
+              </div>
+
+              <!-- 等级徽章容器 (独立 DOM，输入时直接替换 innerHTML，绝不重绘 input) -->
+              <div class="uasa-badge-slot w-20 text-center">
+                ${renderBadgeHtml(gradeInfo)}
+              </div>
+            </div>
+          `;
+
+          container.appendChild(card);
+        });
+
+        // 仅在首次绑定 input 事件
+        document.querySelectorAll('.score-input').forEach(input => {
+          // input 事件实时响应，不影响软键盘
+          input.addEventListener('input', (e) => {
+            const subId = e.target.getAttribute('data-sub');
+            state.setScore(subId, e.target.value);
+            // 仅刷新该单科徽章及顶部统计
+            updateSingleScoreBadge(subId);
+            recalculateUasaSummary();
+          });
+        });
+      }
+
+      recalculateUasaSummary();
+    }
+
+    function renderBadgeHtml(gradeInfo) {
+      if (!gradeInfo) {
+        return `<div class="px-1.5 py-0.5 rounded border border-white/5 text-[10px] text-slate-500 bg-slate-950">未测</div>`;
+      }
+      return `
+        <div class="px-1.5 py-0.5 rounded border text-[10px] font-bold ${gradeInfo.color} ${gradeInfo.bg} shadow-sm animate-spring-in">
+          ${gradeInfo.grade.replace('Gred ', '')} • ${gradeInfo.label}
+        </div>
+      `;
+    }
+
+    // 仅更新单科的成绩徽章
+    function updateSingleScoreBadge(subjectId) {
+      const card = document.querySelector(`[data-uasa-sub="${subjectId}"]`);
+      if (!card) return;
+      const slot = card.querySelector('.uasa-badge-slot');
+      const score = state.data.scores[subjectId];
+      const hasScore = (score !== undefined && score !== null && score !== '');
+      const gradeInfo = hasScore ? calculateGrade(score) : null;
+      slot.innerHTML = renderBadgeHtml(gradeInfo);
+    }
+
+    // 重新汇总 UASA 数据（平均分、总评徽章、及格率、分段胶囊）
+    function recalculateUasaSummary() {
+      let totalScore = 0;
+      let recordedCount = 0;
+      let passCount = 0;
+      const gradeCounts = { 'Gred A': 0, 'Gred B': 0, 'Gred C': 0, 'Gred D': 0, 'Gred E': 0, 'Gred F': 0 };
+
+      KSSM_SUBJECTS_DATA.forEach(sub => {
+        const currentScore = state.data.scores[sub.id];
+        const hasScore = (currentScore !== undefined && currentScore !== null && currentScore !== '');
+        if (hasScore) {
+          totalScore += Number(currentScore);
+          recordedCount++;
+          const gradeInfo = calculateGrade(currentScore);
+          if (gradeInfo) {
+            gradeCounts[gradeInfo.grade] = (gradeCounts[gradeInfo.grade] || 0) + 1;
+            if (gradeInfo.grade !== 'Gred F') passCount++;
+          }
+        }
+      });
+
+      const avgScore = recordedCount > 0 ? (totalScore / recordedCount).toFixed(1) : '--';
+      const avgNum = recordedCount > 0 ? Math.round(totalScore / recordedCount) : null;
+      const overallGrade = calculateGrade(avgNum);
+      const passRate = recordedCount > 0 ? Math.round((passCount / recordedCount) * 100) : 0;
+
+      // 更新顶部 UASA 总评卡片
+      document.getElementById('uasa-average-display').textContent = avgScore;
+      const overallBadge = document.getElementById('uasa-overall-grade-badge');
+      if (overallGrade) {
+        overallBadge.textContent = `${overallGrade.grade} (${overallGrade.label})`;
+        overallBadge.className = `px-2.5 py-1 rounded-lg text-xs font-bold border ${overallGrade.color} ${overallGrade.bg} shadow-md transition-all duration-300`;
+      } else {
+        overallBadge.textContent = '未录入';
+        overallBadge.className = 'px-2.5 py-1 rounded-lg text-xs font-bold bg-slate-800/80 text-slate-400 border border-white/5';
+      }
+      document.getElementById('uasa-recorded-count').textContent = `已记录: ${recordedCount} / ${KSSM_SUBJECTS_DATA.length} 科`;
+      document.getElementById('uasa-pass-rate').textContent = `${passRate}% (${passCount}/${recordedCount})`;
+
+      // 渲染分段统计胶囊
+      const pillsContainer = document.getElementById('grade-distribution-pills');
+      pillsContainer.innerHTML = Object.entries(gradeCounts).map(([g, count]) => {
+        const letter = g.replace('Gred ', '');
+        return `
+          <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 border border-white/5 transition-all ${count > 0 ? 'text-slate-200 border-indigo-500/30' : 'text-slate-600'}">
+            <span>${letter}:</span>
+            <span class="${count > 0 ? 'text-emerald-400 font-bold' : ''}">${count}</span>
+          </span>
+        `;
+      }).join('');
+    }
+
+    // 绑定全局主要事件
+    function bindGlobalEvents() {
+      // 1. 打卡按钮
+      document.getElementById('btn-streak-checkin').addEventListener('click', () => {
+        const res = state.checkInToday();
+        if (res.success) {
+          renderStreakModule();
+          showToast(`打卡成功！已连续学习 ${res.days} 天 🔥`, 'success');
+        } else {
+          showToast(res.message, 'info');
+        }
+      });
+
+      // 2. 筛选标签切换
+      document.querySelectorAll('#filter-tabs .filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+          document.querySelectorAll('#filter-tabs .filter-btn').forEach(b => {
+            b.className = 'filter-btn btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold text-slate-400 hover:text-slate-200 hover:bg-slate-800/60';
+          });
+          e.currentTarget.className = 'filter-btn active btn-spring px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 text-white shadow-md shadow-indigo-600/30';
+          state.data.activeFilter = e.currentTarget.getAttribute('data-filter');
+          renderSubjectsGrid();
+        });
+      });
+
+      // 3. 搜索栏防抖
+      const searchInput = document.getElementById('input-search');
+      let searchTimeout = null;
+      searchInput.addEventListener('input', (e) => {
+        clearTimeout(searchTimeout);
+        searchTimeout = setTimeout(() => {
+          state.data.searchQuery = e.target.value;
+          renderSubjectsGrid();
+        }, 150);
+      });
+
+      // 4. 折叠/展开全部卡片
+      const btnToggleAll = document.getElementById('btn-toggle-all-cards');
+      btnToggleAll.addEventListener('click', () => {
+        const currentlyCollapsedCount = KSSM_SUBJECTS_DATA.filter(s => state.data.collapsed[s.id]).length;
+        const shouldCollapseAll = currentlyCollapsedCount < KSSM_SUBJECTS_DATA.length / 2;
+        KSSM_SUBJECTS_DATA.forEach(sub => {
+          state.data.collapsed[sub.id] = shouldCollapseAll;
+        });
+        state.save();
+        btnToggleAll.textContent = shouldCollapseAll ? '展开全部' : '折叠全部';
+        renderSubjectsGrid();
+      });
+
+      // 5. 目标倒计时日期模态窗
+      const modalDate = document.getElementById('modal-exam-date');
+      const inputDate = document.getElementById('input-target-date');
+      document.getElementById('btn-edit-exam-date').addEventListener('click', () => {
+        inputDate.value = state.data.targetExamDate || '2026-12-15';
+        modalDate.classList.remove('hidden');
+        requestAnimationFrame(() => {
+          modalDate.classList.remove('opacity-0');
+          modalDate.querySelector('div').classList.remove('scale-95');
+        });
+      });
+      document.getElementById('btn-close-date-modal').addEventListener('click', () => {
+        modalDate.classList.add('opacity-0');
+        setTimeout(() => modalDate.classList.add('hidden'), 200);
+      });
+      document.getElementById('btn-save-exam-date').addEventListener('click', () => {
+        if (inputDate.value) {
+          state.data.targetExamDate = inputDate.value;
+          state.save();
+          renderCountdownModule();
+          modalDate.classList.add('opacity-0');
+          setTimeout(() => modalDate.classList.add('hidden'), 200);
+          showToast('目标考试日期已更新', 'success');
+        }
+      });
+
+      // 6. 单科清空确认弹窗处理
+      const modalUncheck = document.getElementById('modal-confirm-uncheck');
+      document.getElementById('btn-cancel-uncheck').addEventListener('click', () => {
+        modalUncheck.classList.add('opacity-0');
+        setTimeout(() => modalUncheck.classList.add('hidden'), 200);
+        pendingUncheckSubjectId = null;
+      });
+      document.getElementById('btn-proceed-uncheck').addEventListener('click', () => {
+        if (pendingUncheckSubjectId) {
+          state.batchCheckSubject(pendingUncheckSubjectId, false);
+          const card = document.querySelector(`.subject-card[data-sub="${pendingUncheckSubjectId}"]`);
+          if (card) {
+            card.querySelectorAll('.custom-checkbox').forEach(cb => {
+              cb.checked = false;
+              const row = cb.closest('.chapter-row');
+              const text = row.querySelector('.chapter-title-text');
+              row.className = 'chapter-row group flex items-start gap-2.5 p-2 rounded-lg cursor-pointer transition-all duration-200 border bg-slate-950/60 border-white/5 hover:border-white/10 text-slate-300';
+              text.classList.remove('line-through', 'text-slate-500');
+            });
+          }
+          updateSingleSubjectProgress(pendingUncheckSubjectId);
+          renderGlobalStats();
+          modalUncheck.classList.add('opacity-0');
+          setTimeout(() => modalUncheck.classList.add('hidden'), 200);
+          showToast('已清空该科进度', 'info');
+          pendingUncheckSubjectId = null;
+        }
+      });
+
+      // 7. 导出数据 JSON
+      document.getElementById('btn-export-json').addEventListener('click', () => {
+        const todayStr = state.getTodayDateString();
+        const exportData = {
+          exportDate: todayStr,
+          app: 'KSSM_Form3_Tracker',
+          version: '2.0',
+          data: state.data
+        };
+        const blob = new Blob([JSON.stringify(exportData, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `kssm_form3_progress_${todayStr}.json`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+        showToast('备份数据已成功导出为 JSON', 'success');
+      });
+
+      // 8. 导入数据 JSON
+      document.getElementById('input-import-json').addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          try {
+            const parsed = JSON.parse(event.target.result);
+            if (parsed && parsed.data) {
+              state.data = parsed.data;
+            } else if (parsed && parsed.progress) {
+              state.data = parsed;
+            } else {
+              throw new Error('无效的数据格式');
+            }
+            state.validateStreak();
+            state.save();
+            renderStreakModule();
+            renderCountdownModule();
+            renderGlobalStats();
+            renderSubjectsGrid();
+            renderUasaModule(true);
+            showToast('数据恢复成功！', 'success');
+          } catch (err) {
+            console.error(err);
+            showToast('导入失败：文件结构不正确', 'error');
+          }
+          e.target.value = '';
+        };
+        reader.readAsText(file);
+      });
+
+      // 9. 重置全部数据
+      document.getElementById('btn-reset-all').addEventListener('click', () => {
+        if (confirm(`⚠️ 警告：这将清空所有 ${KSSM_SUBJECTS_DATA.length} 科学习打勾进度、火花连胜及 UASA 模拟考成绩！\n\n确认清空吗？`)) {
+          if (confirm('请再次确认：清空后无法撤回（除非您曾导出过备份文件）。')) {
+            state.resetAll();
+            renderStreakModule();
+            renderCountdownModule();
+            renderGlobalStats();
+            renderSubjectsGrid();
+            renderUasaModule(true);
+            showToast('全部数据已重置为初始状态', 'info');
+          }
+        }
+      });
+
+      // 10. 清空所有成绩
+      document.getElementById('btn-clear-scores').addEventListener('click', () => {
+        if (confirm('确认清空所有科目的 UASA 模拟考成绩？')) {
+          state.clearAllScores();
+          renderUasaModule(true);
+          showToast('UASA 成绩记录已清空', 'info');
+        }
+      });
+    }
+
+    // 轻量 Toast 提示框
+    function showToast(message, type = 'info') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      
+      const typeStyles = {
+        success: 'bg-emerald-950/90 border-emerald-600/80 text-emerald-200',
+        error: 'bg-red-950/90 border-red-600/80 text-red-200',
+        info: 'bg-slate-900/90 border-indigo-500/80 text-slate-200',
+      };
+
+      toast.className = `pointer-events-auto flex items-center gap-2 px-4 py-2.5 rounded-xl border backdrop-blur-xl shadow-2xl text-xs font-medium transition-all duration-300 transform translate-y-2 opacity-0 ${typeStyles[type] || typeStyles.info}`;
+      toast.innerHTML = `
+        <span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span>
+        <span>${message}</span>
+      `;
+
+      container.appendChild(toast);
+      requestAnimationFrame(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      });
+
+      setTimeout(() => {
+        toast.classList.add('opacity-0', 'translate-y-2');
+        setTimeout(() => toast.remove(), 300);
+      }, 2800);
+    }
+
+    window.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
