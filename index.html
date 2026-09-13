@@ -6,6 +6,8 @@
   <title>丘祥Form3学习进度报告</title>
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Supabase JS Client CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
     tailwind.config = {
       darkMode: 'class',
@@ -154,6 +156,12 @@
 
       <!-- 快捷操作与备份 -->
       <div class="flex items-center gap-2">
+        <!-- 云端多端同步状态 (支持点击手动触发双向同步) -->
+        <button id="btn-cloud-sync" title="云端实时同步 (点击立即双向同步)" class="btn-spring inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm transition-all">
+          <span id="cloud-sync-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
+          <span id="cloud-sync-text">连接云端...</span>
+        </button>
+
         <button id="btn-export-json" title="导出备份 JSON" class="btn-spring inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm">
           <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
@@ -734,21 +742,30 @@
     }
 
     /**
-     * 数据服务层 (已适配 Supabase 云端接入插槽)
+     * 数据服务层 (Supabase 云端实时同步 + 本地 localStorage 双持久化)
      */
     const STORAGE_KEY = 'KSSM_F3_TRACKER_V2';
 
-    // 预留的 Supabase 云端同步配置插槽
     const SUPABASE_CONFIG = {
-      url: '', // e.g. 'https://your-project.supabase.co'
-      anonKey: '', // e.g. 'eyJhbGci...'
-      enabled: false,
-      tableName: 'student_progress'
+      url: 'https://abzacuzhggyvlqwwtlyj.supabase.co',
+      anonKey: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFiemFjdXpoZ2d5dmxxd3d0bHlqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODkyODE5NzIsImV4cCI6MjEwNDg1Nzk3Mn0.cZ6o_p7maiPH18KtuBBSRWfwDmC8Eb1j6ePIi7aBWuE',
+      enabled: true,
+      tableName: 'f3_study_records',
+      recordId: 'qiuxiang'
     };
+
+    let supabaseClient = null;
+    let syncDebounceTimer = null;
+    let isCloudSyncing = false;
 
     class AppState {
       constructor() {
-        this.data = {
+        this.data = this.getDefaultData();
+        this.load();
+      }
+
+      getDefaultData() {
+        return {
           streak: {
             days: 0,
             lastCheckInDate: null,
@@ -759,9 +776,9 @@
           scores: {},   // { [subjectId]: number }
           collapsed: {},
           activeFilter: 'all',
-          searchQuery: ''
+          searchQuery: '',
+          updatedAt: new Date().toISOString()
         };
-        this.load();
       }
 
       load() {
@@ -769,7 +786,7 @@
           const raw = localStorage.getItem(STORAGE_KEY);
           if (raw) {
             const parsed = JSON.parse(raw);
-            this.data = Object.assign(this.data, parsed);
+            this.data = Object.assign(this.getDefaultData(), parsed);
           }
         } catch (e) {
           console.error('加载本地存储异常:', e);
@@ -779,13 +796,22 @@
 
       save() {
         try {
+          this.data.updatedAt = new Date().toISOString();
           localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
-          // 如开启 Supabase 则异步推送到云端
-          if (SUPABASE_CONFIG.enabled && typeof window.syncToSupabase === 'function') {
-            window.syncToSupabase(this.data);
+          // 如开启 Supabase 则防抖推送到云端
+          if (SUPABASE_CONFIG.enabled && typeof syncToSupabase === 'function') {
+            syncToSupabase();
           }
         } catch (e) {
           console.error('保存本地失败:', e);
+        }
+      }
+
+      saveLocalOnly() {
+        try {
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(this.data));
+        } catch (e) {
+          console.error('仅保存本地失败:', e);
         }
       }
 
@@ -797,7 +823,7 @@
         const diffDays = this.getDaysDifference(last, todayStr);
         if (diffDays > 1) {
           this.data.streak.days = 0;
-          this.save();
+          this.saveLocalOnly();
         }
       }
 
@@ -885,15 +911,7 @@
       }
 
       resetAll() {
-        this.data = {
-          streak: { days: 0, lastCheckInDate: null, history: [] },
-          targetExamDate: '2026-12-15',
-          progress: {},
-          scores: {},
-          collapsed: {},
-          activeFilter: 'all',
-          searchQuery: ''
-        };
+        this.data = this.getDefaultData();
         this.save();
       }
     }
@@ -907,12 +925,187 @@
      * UI 初始化与渲染
      */
     function init() {
+      reRenderAll();
+      bindGlobalEvents();
+      initSupabase();
+    }
+
+    function reRenderAll() {
       renderStreakModule();
       renderCountdownModule();
       renderGlobalStats();
-      renderSubjectsGrid(); // 初次构建 9 科卡片
+      renderSubjectsGrid(); // 初次构建 11 科卡片
       renderUasaModule(true); // 初次构建 UASA 卡片
-      bindGlobalEvents();
+    }
+
+    /**
+     * Supabase 云端同步驱动模块
+     */
+    function initSupabase() {
+      if (!SUPABASE_CONFIG.enabled) {
+        setSyncStatus('offline', '本地模式');
+        return;
+      }
+
+      if (window.supabase && typeof window.supabase.createClient === 'function') {
+        try {
+          supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+
+          // 订阅实时数据推送 (Postgres Realtime)
+          try {
+            supabaseClient
+              .channel('f3_study_records_realtime')
+              .on(
+                'postgres_changes',
+                {
+                  event: '*',
+                  schema: 'public',
+                  table: SUPABASE_CONFIG.tableName,
+                  filter: `id=eq.${SUPABASE_CONFIG.recordId}`
+                },
+                (payload) => {
+                  if (payload.new && payload.new.data) {
+                    const remote = payload.new.data;
+                    if (remote.updatedAt && remote.updatedAt !== state.data.updatedAt) {
+                      const remoteTime = new Date(remote.updatedAt).getTime();
+                      const localTime = state.data.updatedAt ? new Date(state.data.updatedAt).getTime() : 0;
+                      if (remoteTime > localTime) {
+                        state.data = Object.assign(state.getDefaultData(), remote);
+                        state.saveLocalOnly();
+                        reRenderAll();
+                        setSyncStatus('synced', '多端实时已同步');
+                        showToast('已同步其他设备的最新学习打勾记录', 'info');
+                      }
+                    }
+                  }
+                }
+              )
+              .subscribe();
+          } catch (e) {
+            console.warn('Supabase Realtime 提示:', e);
+          }
+
+          // 页面初始化时拉取一次云端数据
+          pullFromCloud(false);
+        } catch (err) {
+          console.error('Supabase 初始化异常:', err);
+          setSyncStatus('error', '云端连接失败');
+        }
+      } else {
+        console.warn('Supabase SDK 未加载完成');
+        setSyncStatus('offline', '本地模式');
+      }
+    }
+
+    function setSyncStatus(status, text) {
+      const dot = document.getElementById('cloud-sync-dot');
+      const label = document.getElementById('cloud-sync-text');
+      if (!dot || !label) return;
+
+      dot.className = 'w-2 h-2 rounded-full transition-colors';
+      if (status === 'syncing') {
+        dot.classList.add('bg-amber-400', 'animate-pulse');
+        label.textContent = text || '同步中...';
+        label.className = 'text-xs text-amber-300 font-medium';
+      } else if (status === 'synced') {
+        dot.classList.add('bg-emerald-400');
+        label.textContent = text || '云端已同步';
+        label.className = 'text-xs text-emerald-300 font-medium';
+      } else if (status === 'error') {
+        dot.classList.add('bg-red-400');
+        label.textContent = text || '同步失败(重试)';
+        label.className = 'text-xs text-red-300 font-medium';
+      } else {
+        dot.classList.add('bg-slate-500');
+        label.textContent = text || '本地模式';
+        label.className = 'text-xs text-slate-400 font-medium';
+      }
+    }
+
+    // 从云端拉取
+    async function pullFromCloud(showFeedback = false) {
+      if (!supabaseClient) return;
+      if (isCloudSyncing) return;
+      isCloudSyncing = true;
+      setSyncStatus('syncing', '正在连接云端...');
+
+      try {
+        const { data, error } = await supabaseClient
+          .from(SUPABASE_CONFIG.tableName)
+          .select('*')
+          .eq('id', SUPABASE_CONFIG.recordId)
+          .maybeSingle();
+
+        if (error) throw error;
+
+        // 判断云端数据是否有效
+        if (data && data.data && (data.data.progress || data.data.streak)) {
+          const remoteData = data.data;
+          const remoteTime = remoteData.updatedAt ? new Date(remoteData.updatedAt).getTime() : 0;
+          const localTime = state.data.updatedAt ? new Date(state.data.updatedAt).getTime() : 0;
+
+          const localChapterCount = Object.values(state.data.progress || {}).reduce((acc, arr) => acc + (arr ? arr.length : 0), 0);
+          const remoteChapterCount = Object.values(remoteData.progress || {}).reduce((acc, arr) => acc + (arr ? arr.length : 0), 0);
+
+          // 决策：当云端更新，或者本地为空且云端有进度时，覆盖本地
+          if (remoteTime > localTime || (localChapterCount === 0 && remoteChapterCount > 0)) {
+            state.data = Object.assign(state.getDefaultData(), remoteData);
+            state.saveLocalOnly();
+            reRenderAll();
+            setSyncStatus('synced', '云端已同步');
+            if (showFeedback) showToast('已成功从云端载入最新进度！', 'success');
+          } else if (localTime > remoteTime || (localChapterCount > 0 && remoteChapterCount === 0)) {
+            // 本地数据更新，主动推送到云端
+            await pushToCloudNow();
+            if (showFeedback) showToast('已将本地最新数据同步至云端', 'success');
+          } else {
+            setSyncStatus('synced', '云端已同步');
+            if (showFeedback) showToast('数据已是最新状态', 'info');
+          }
+        } else {
+          // 云端数据为空或仅为测试数据，立即将当前本地数据推送至云端
+          await pushToCloudNow();
+          if (showFeedback) showToast('已将本地数据同步至云端！', 'success');
+        }
+      } catch (err) {
+        console.error('拉取云端数据失败:', err);
+        setSyncStatus('error', '云端连接失败');
+        if (showFeedback) showToast('云端连接失败，请检查网络设置', 'error');
+      } finally {
+        isCloudSyncing = false;
+      }
+    }
+
+    // 防抖推送到云端
+    function syncToSupabase() {
+      if (!supabaseClient) return;
+      setSyncStatus('syncing', '正在同步...');
+      if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
+      syncDebounceTimer = setTimeout(() => {
+        pushToCloudNow();
+      }, 700);
+    }
+
+    // 立即执行推送到云端
+    async function pushToCloudNow() {
+      if (!supabaseClient) return;
+      try {
+        setSyncStatus('syncing', '正在保存到云端...');
+        const payload = {
+          id: SUPABASE_CONFIG.recordId,
+          data: state.data,
+          updated_at: new Date().toISOString()
+        };
+        const { error } = await supabaseClient
+          .from(SUPABASE_CONFIG.tableName)
+          .upsert(payload);
+
+        if (error) throw error;
+        setSyncStatus('synced', '云端已同步');
+      } catch (err) {
+        console.error('推送到云端失败:', err);
+        setSyncStatus('error', '保存到云端失败');
+      }
     }
 
     // 模块一：渲染火花打卡状态
@@ -1597,6 +1790,24 @@
           renderUasaModule(true);
           showToast('UASA 成绩记录已清空', 'info');
         }
+      });
+
+      // 11. 云端手动双向同步
+      const btnCloudSync = document.getElementById('btn-cloud-sync');
+      if (btnCloudSync) {
+        btnCloudSync.addEventListener('click', () => {
+          pullFromCloud(true);
+        });
+      }
+
+      // 12. 切换标签页或窗口重获焦点时自动刷新云端数据 (多端无缝切换)
+      window.addEventListener('visibilitychange', () => {
+        if (document.visibilityState === 'visible') {
+          pullFromCloud(false);
+        }
+      });
+      window.addEventListener('focus', () => {
+        pullFromCloud(false);
       });
     }
 
