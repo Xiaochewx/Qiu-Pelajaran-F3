@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="zh-CN" class="dark">
+<html lang="zh-CN" class="dark overflow-x-hidden">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -134,51 +134,51 @@
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen font-sans selection:bg-indigo-500/30 selection:text-indigo-200 relative overflow-x-hidden">
 
-  <!-- 背景流光高斯模糊氛围灯 (Ambient Glow Orbs) -->
-  <div class="fixed top-[-10%] left-[-5%] w-[450px] h-[450px] bg-indigo-600/10 rounded-full blur-[120px] pointer-events-none -z-10 animate-pulse-slow"></div>
-  <div class="fixed top-[30%] right-[-10%] w-[500px] h-[500px] bg-emerald-600/10 rounded-full blur-[140px] pointer-events-none -z-10"></div>
-  <div class="fixed bottom-[-10%] left-[20%] w-[600px] h-[600px] bg-purple-600/10 rounded-full blur-[160px] pointer-events-none -z-10"></div>
+  <!-- 背景流光高斯模糊氛围灯 (隔离在 overflow-hidden 容器中，杜绝手机端横向拉伸) -->
+  <div class="fixed inset-0 overflow-hidden pointer-events-none -z-10">
+    <div class="absolute top-[-10%] left-[-5%] w-[350px] sm:w-[450px] h-[350px] sm:h-[450px] bg-indigo-600/10 rounded-full blur-[100px] sm:blur-[120px] animate-pulse-slow"></div>
+    <div class="absolute top-[30%] right-[-10%] w-[350px] sm:w-[500px] h-[350px] sm:h-[500px] bg-emerald-600/10 rounded-full blur-[100px] sm:blur-[140px]"></div>
+    <div class="absolute bottom-[-10%] left-[20%] w-[400px] sm:w-[600px] h-[400px] sm:h-[600px] bg-purple-600/10 rounded-full blur-[120px] sm:blur-[160px]"></div>
+  </div>
 
   <!-- 顶部导航栏 (高斯模糊毛玻璃) -->
-  <header class="sticky top-0 z-40 backdrop-blur-2xl bg-slate-950/75 border-b border-white/5 transition-all duration-300">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+  <header class="sticky top-0 z-40 backdrop-blur-2xl bg-slate-950/85 border-b border-white/5 transition-all duration-300">
+    <div class="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 h-14 sm:h-16 flex items-center justify-between gap-1.5 sm:gap-4">
       <!-- 标志与系统名 -->
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-amber-500 flex items-center justify-center shadow-lg shadow-indigo-500/25 text-white font-black text-lg tracking-wider transform hover:rotate-3 transition-transform cursor-pointer">
+      <div class="flex items-center gap-2 sm:gap-3 min-w-0 shrink">
+        <div class="w-7 h-7 sm:w-9 sm:h-9 rounded-xl bg-gradient-to-tr from-indigo-600 via-violet-600 to-amber-500 flex items-center justify-center shadow-md shadow-indigo-500/25 text-white font-black text-xs sm:text-base tracking-wider shrink-0">
           F3
         </div>
-        <div>
-          <h1 class="font-bold text-base sm:text-lg text-slate-100 tracking-tight leading-none">
-            丘祥Form3学习进度报告
-          </h1>
-        </div>
+        <h1 class="font-bold text-xs sm:text-base lg:text-lg text-slate-100 tracking-tight whitespace-nowrap truncate">
+          丘祥Form3学习进度报告
+        </h1>
       </div>
 
-      <!-- 快捷操作与备份 -->
-      <div class="flex items-center gap-2">
+      <!-- 快捷操作与备份 (手机端紧凑自适应，杜绝溢出) -->
+      <div class="flex items-center gap-1 sm:gap-2 shrink-0">
         <!-- 云端多端同步状态 (支持点击手动触发双向同步) -->
-        <button id="btn-cloud-sync" title="云端实时同步 (点击立即双向同步)" class="btn-spring inline-flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm transition-all">
-          <span id="cloud-sync-dot" class="w-2 h-2 rounded-full bg-slate-500"></span>
-          <span id="cloud-sync-text">连接云端...</span>
+        <button id="btn-cloud-sync" title="云端实时同步 (点击立即双向同步)" class="btn-spring inline-flex items-center gap-1 sm:gap-1.5 px-2 py-1 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm transition-all whitespace-nowrap shrink-0">
+          <span id="cloud-sync-dot" class="w-2 h-2 rounded-full bg-slate-500 shrink-0"></span>
+          <span id="cloud-sync-text" class="whitespace-nowrap text-[11px] sm:text-xs">同步中...</span>
         </button>
 
-        <button id="btn-export-json" title="导出备份 JSON" class="btn-spring inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm">
-          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="btn-export-json" title="导出备份 JSON" class="btn-spring inline-flex items-center justify-center gap-1.5 p-1 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm shrink-0">
+          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
           </svg>
           <span class="hidden md:inline">导出备份</span>
         </button>
 
-        <label for="input-import-json" title="导入备份 JSON" class="btn-spring cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm">
-          <svg class="w-3.5 h-3.5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <label for="input-import-json" title="导入备份 JSON" class="btn-spring cursor-pointer inline-flex items-center justify-center gap-1.5 p-1 sm:px-3 sm:py-1.5 rounded-lg text-xs font-medium bg-slate-900/80 hover:bg-slate-800 text-slate-300 hover:text-white border border-white/10 shadow-sm shrink-0">
+          <svg class="w-3.5 h-3.5 text-slate-400 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
           </svg>
           <span class="hidden md:inline">导入数据</span>
           <input type="file" id="input-import-json" accept=".json" class="hidden">
         </label>
 
-        <button id="btn-reset-all" title="重置全部数据" class="btn-spring inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-medium bg-red-950/40 hover:bg-red-900/60 text-red-400 hover:text-red-300 border border-red-800/40">
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <button id="btn-reset-all" title="重置全部数据" class="btn-spring inline-flex items-center justify-center gap-1.5 p-1 sm:px-2.5 sm:py-1.5 rounded-lg text-xs font-medium bg-red-950/40 hover:bg-red-900/60 text-red-400 hover:text-red-300 border border-red-800/40 hidden sm:inline-flex shrink-0">
+          <svg class="w-3.5 h-3.5 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
           </svg>
           <span class="hidden lg:inline">重置</span>
@@ -472,8 +472,8 @@
     </div>
   </footer>
 
-  <!-- 提示弹窗 (Toast) -->
-  <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
+  <!-- 提示弹窗 (Toast - 移动端居中，桌面端居右) -->
+  <div id="toast-container" class="fixed bottom-5 right-4 left-4 sm:left-auto sm:right-5 z-50 flex flex-col items-center sm:items-end gap-2 pointer-events-none"></div>
 
   <!-- 核心数据与业务逻辑 -->
   <script>
@@ -777,7 +777,7 @@
           collapsed: {},
           activeFilter: 'all',
           searchQuery: '',
-          updatedAt: new Date().toISOString()
+          updatedAt: null // 新设备默认为空，避免本地默认时间戳覆盖云端已有进度
         };
       }
 
@@ -835,9 +835,23 @@
         return `${year}-${month}-${day}`;
       }
 
+      parseDate(dateStr) {
+        if (!dateStr) return new Date();
+        const parts = String(dateStr).split('-');
+        if (parts.length === 3) {
+          const y = parseInt(parts[0], 10);
+          const m = parseInt(parts[1], 10) - 1;
+          const d = parseInt(parts[2], 10);
+          return new Date(y, m, d);
+        }
+        return new Date(dateStr);
+      }
+
       getDaysDifference(dateStr1, dateStr2) {
-        const d1 = new Date(dateStr1 + 'T00:00:00');
-        const d2 = new Date(dateStr2 + 'T00:00:00');
+        const d1 = this.parseDate(dateStr1);
+        const d2 = this.parseDate(dateStr2);
+        d1.setHours(0, 0, 0, 0);
+        d2.setHours(0, 0, 0, 0);
         const diffTime = Math.abs(d2.getTime() - d1.getTime());
         return Math.round(diffTime / (1000 * 60 * 60 * 24));
       }
@@ -939,17 +953,30 @@
     }
 
     /**
-     * Supabase 云端同步驱动模块
+     * Supabase 云端同步驱动模块 (包含防挂死超时、弱网轮询重试、移动端自适应)
      */
+    let supabaseInitAttempts = 0;
+    let hasPendingPush = false;
+
+    function fetchWithTimeout(promise, ms = 9000) {
+      let timer = null;
+      const timeoutPromise = new Promise((_, reject) => {
+        timer = setTimeout(() => reject(new Error('网络请求超时')), ms);
+      });
+      return Promise.race([promise, timeoutPromise]).finally(() => clearTimeout(timer));
+    }
+
     function initSupabase() {
       if (!SUPABASE_CONFIG.enabled) {
-        setSyncStatus('offline', '本地模式');
+        setSyncStatus('offline');
         return;
       }
 
       if (window.supabase && typeof window.supabase.createClient === 'function') {
         try {
-          supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+          if (!supabaseClient) {
+            supabaseClient = window.supabase.createClient(SUPABASE_CONFIG.url, SUPABASE_CONFIG.anonKey);
+          }
 
           // 订阅实时数据推送 (Postgres Realtime)
           try {
@@ -973,7 +1000,7 @@
                         state.data = Object.assign(state.getDefaultData(), remote);
                         state.saveLocalOnly();
                         reRenderAll();
-                        setSyncStatus('synced', '多端实时已同步');
+                        setSyncStatus('synced', '多端已同步');
                         showToast('已同步其他设备的最新学习打勾记录', 'info');
                       }
                     }
@@ -985,81 +1012,121 @@
             console.warn('Supabase Realtime 提示:', e);
           }
 
-          // 页面初始化时拉取一次云端数据
-          pullFromCloud(false);
+          if (hasPendingPush) {
+            hasPendingPush = false;
+            pushToCloudNow();
+          } else {
+            pullFromCloud(false);
+          }
         } catch (err) {
           console.error('Supabase 初始化异常:', err);
-          setSyncStatus('error', '云端连接失败');
+          setSyncStatus('error');
         }
       } else {
-        console.warn('Supabase SDK 未加载完成');
-        setSyncStatus('offline', '本地模式');
+        // 手机移动端在弱网或加载 CDN 脚本稍慢时，持续重试
+        if (supabaseInitAttempts < 20) {
+          supabaseInitAttempts++;
+          setSyncStatus('syncing', '连接中...');
+          setTimeout(initSupabase, 300);
+        } else {
+          console.warn('Supabase SDK 未能加载');
+          setSyncStatus('offline');
+        }
       }
     }
 
-    function setSyncStatus(status, text) {
+    function setSyncStatus(status, customText = null) {
       const dot = document.getElementById('cloud-sync-dot');
       const label = document.getElementById('cloud-sync-text');
       if (!dot || !label) return;
 
-      dot.className = 'w-2 h-2 rounded-full transition-colors';
+      const isMobile = window.innerWidth < 640;
+      dot.className = 'w-2 h-2 rounded-full transition-colors flex-shrink-0';
+
       if (status === 'syncing') {
         dot.classList.add('bg-amber-400', 'animate-pulse');
-        label.textContent = text || '同步中...';
-        label.className = 'text-xs text-amber-300 font-medium';
+        label.textContent = customText || (isMobile ? '同步中' : '正在同步...');
+        label.className = 'whitespace-nowrap text-[11px] sm:text-xs text-amber-300 font-medium';
       } else if (status === 'synced') {
         dot.classList.add('bg-emerald-400');
-        label.textContent = text || '云端已同步';
-        label.className = 'text-xs text-emerald-300 font-medium';
+        label.textContent = customText || (isMobile ? '已同步' : '云端已同步');
+        label.className = 'whitespace-nowrap text-[11px] sm:text-xs text-emerald-300 font-medium';
       } else if (status === 'error') {
         dot.classList.add('bg-red-400');
-        label.textContent = text || '同步失败(重试)';
-        label.className = 'text-xs text-red-300 font-medium';
+        label.textContent = customText || (isMobile ? '重试' : '连接失败(重试)');
+        label.className = 'whitespace-nowrap text-[11px] sm:text-xs text-red-300 font-medium';
       } else {
         dot.classList.add('bg-slate-500');
-        label.textContent = text || '本地模式';
-        label.className = 'text-xs text-slate-400 font-medium';
+        label.textContent = customText || (isMobile ? '本地' : '本地模式');
+        label.className = 'whitespace-nowrap text-[11px] sm:text-xs text-slate-400 font-medium';
       }
     }
 
     // 从云端拉取
     async function pullFromCloud(showFeedback = false) {
-      if (!supabaseClient) return;
-      if (isCloudSyncing) return;
+      if (!supabaseClient) {
+        initSupabase();
+        if (!supabaseClient) {
+          if (showFeedback) showToast('云端服务连接中，请稍后再试', 'info');
+          return;
+        }
+      }
+      if (isCloudSyncing) {
+        if (showFeedback) showToast('正在与云端同步中，请稍候...', 'info');
+        return;
+      }
       isCloudSyncing = true;
-      setSyncStatus('syncing', '正在连接云端...');
+      setSyncStatus('syncing');
 
       try {
-        const { data, error } = await supabaseClient
+        const queryPromise = supabaseClient
           .from(SUPABASE_CONFIG.tableName)
           .select('*')
           .eq('id', SUPABASE_CONFIG.recordId)
           .maybeSingle();
 
+        const { data, error } = await fetchWithTimeout(queryPromise, 9000);
+
         if (error) throw error;
 
         // 判断云端数据是否有效
-        if (data && data.data && (data.data.progress || data.data.streak)) {
+        if (data && data.data && (data.data.progress || data.data.streak || data.data.scores)) {
           const remoteData = data.data;
           const remoteTime = remoteData.updatedAt ? new Date(remoteData.updatedAt).getTime() : 0;
           const localTime = state.data.updatedAt ? new Date(state.data.updatedAt).getTime() : 0;
 
           const localChapterCount = Object.values(state.data.progress || {}).reduce((acc, arr) => acc + (arr ? arr.length : 0), 0);
           const remoteChapterCount = Object.values(remoteData.progress || {}).reduce((acc, arr) => acc + (arr ? arr.length : 0), 0);
+          const localScoreCount = Object.keys(state.data.scores || {}).length;
+          const remoteScoreCount = Object.keys(remoteData.scores || {}).length;
+          const localStreak = (state.data.streak && state.data.streak.days) || 0;
+          const remoteStreak = (remoteData.streak && remoteData.streak.days) || 0;
 
-          // 决策：当云端更新，或者本地为空且云端有进度时，覆盖本地
-          if (remoteTime > localTime || (localChapterCount === 0 && remoteChapterCount > 0)) {
+          const localHasContent = localChapterCount > 0 || localScoreCount > 0 || localStreak > 0;
+          const remoteHasContent = remoteChapterCount > 0 || remoteScoreCount > 0 || remoteStreak > 0;
+
+          // 核心决策准则：
+          // 1. 若当前设备尚无真实进度（如新手机首次打开），而云端有内容 -> 绝对拉取云端覆盖
+          // 2. 若云端更新时间比本地新 -> 拉取云端覆盖
+          // 3. 若本地比云端新，或本地有内容而云端为空 -> 推送本地到云端
+          if (!localHasContent && remoteHasContent) {
             state.data = Object.assign(state.getDefaultData(), remoteData);
             state.saveLocalOnly();
             reRenderAll();
-            setSyncStatus('synced', '云端已同步');
-            if (showFeedback) showToast('已成功从云端载入最新进度！', 'success');
-          } else if (localTime > remoteTime || (localChapterCount > 0 && remoteChapterCount === 0)) {
+            setSyncStatus('synced');
+            if (showFeedback) showToast('已成功从云端载入学习进度！', 'success');
+          } else if (remoteTime > localTime) {
+            state.data = Object.assign(state.getDefaultData(), remoteData);
+            state.saveLocalOnly();
+            reRenderAll();
+            setSyncStatus('synced');
+            if (showFeedback) showToast('已从云端同步最新数据！', 'success');
+          } else if (localTime > remoteTime || (localHasContent && !remoteHasContent)) {
             // 本地数据更新，主动推送到云端
             await pushToCloudNow();
             if (showFeedback) showToast('已将本地最新数据同步至云端', 'success');
           } else {
-            setSyncStatus('synced', '云端已同步');
+            setSyncStatus('synced');
             if (showFeedback) showToast('数据已是最新状态', 'info');
           }
         } else {
@@ -1069,8 +1136,8 @@
         }
       } catch (err) {
         console.error('拉取云端数据失败:', err);
-        setSyncStatus('error', '云端连接失败');
-        if (showFeedback) showToast('云端连接失败，请检查网络设置', 'error');
+        setSyncStatus('error');
+        if (showFeedback) showToast('云端连接异常，已切入本地模式', 'error');
       } finally {
         isCloudSyncing = false;
       }
@@ -1078,8 +1145,12 @@
 
     // 防抖推送到云端
     function syncToSupabase() {
-      if (!supabaseClient) return;
-      setSyncStatus('syncing', '正在同步...');
+      if (!supabaseClient) {
+        hasPendingPush = true;
+        initSupabase();
+        return;
+      }
+      setSyncStatus('syncing');
       if (syncDebounceTimer) clearTimeout(syncDebounceTimer);
       syncDebounceTimer = setTimeout(() => {
         pushToCloudNow();
@@ -1090,21 +1161,22 @@
     async function pushToCloudNow() {
       if (!supabaseClient) return;
       try {
-        setSyncStatus('syncing', '正在保存到云端...');
+        setSyncStatus('syncing');
         const payload = {
           id: SUPABASE_CONFIG.recordId,
           data: state.data,
           updated_at: new Date().toISOString()
         };
-        const { error } = await supabaseClient
+        const upsertPromise = supabaseClient
           .from(SUPABASE_CONFIG.tableName)
           .upsert(payload);
 
+        const { error } = await fetchWithTimeout(upsertPromise, 9000);
         if (error) throw error;
-        setSyncStatus('synced', '云端已同步');
+        setSyncStatus('synced');
       } catch (err) {
         console.error('推送到云端失败:', err);
-        setSyncStatus('error', '保存到云端失败');
+        setSyncStatus('error');
       }
     }
 
@@ -1138,7 +1210,8 @@
       const targetStr = state.data.targetExamDate || '2026-12-15';
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-      const target = new Date(targetStr + 'T00:00:00');
+      const target = state.parseDate(targetStr);
+      target.setHours(0, 0, 0, 0);
       
       const diffTime = target.getTime() - today.getTime();
       const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -1508,7 +1581,7 @@
             <div class="flex items-center gap-2.5 flex-shrink-0">
               <!-- 分数输入框 (0-100) -->
               <div class="relative w-16">
-                <input type="number" min="0" max="100" data-sub="${sub.id}" value="${hasScore ? currentScore : ''}" placeholder="分" class="score-input w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1 text-center text-xs font-bold text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all">
+                <input type="number" inputmode="numeric" pattern="[0-9]*" min="0" max="100" data-sub="${sub.id}" value="${hasScore ? currentScore : ''}" placeholder="分" class="score-input w-full bg-slate-950 border border-slate-700/80 rounded-lg px-2 py-1 text-center text-xs font-bold text-slate-100 focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500/30 transition-all">
               </div>
 
               <!-- 等级徽章容器 (独立 DOM，输入时直接替换 innerHTML，绝不重绘 input) -->
@@ -1792,10 +1865,19 @@
         }
       });
 
-      // 11. 云端手动双向同步
+      // 11. 云端手动双向同步 (防卡顿、防死锁、带即时反馈)
       const btnCloudSync = document.getElementById('btn-cloud-sync');
       if (btnCloudSync) {
         btnCloudSync.addEventListener('click', () => {
+          if (!supabaseClient) {
+            showToast('正在连接云端服务...', 'info');
+            initSupabase();
+            return;
+          }
+          if (isCloudSyncing) {
+            showToast('正在与云端交换数据，请稍候...', 'info');
+            return;
+          }
           pullFromCloud(true);
         });
       }
